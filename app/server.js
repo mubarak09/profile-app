@@ -18,7 +18,15 @@ app.get("/", function (req, res) {
 });
 
 app.get("/profile-picture", function (req, res) {
-  let img = fs.readFileSync(path.resolve("./images/profile-1.jpg"));
+  // Choose image from environment variable IMAGE, default to 'profile-1'
+  const imageName = (process.env.IMAGE || 'profile-1') + '.jpg';
+  const imagePath = path.resolve(`./images/${imageName}`);
+
+  // If the requested image does not exist, fall back to profile-1.jpg
+  const fallbackPath = path.resolve('./images/profile-1.jpg');
+  const finalPath = fs.existsSync(imagePath) ? imagePath : fallbackPath;
+
+  const img = fs.readFileSync(finalPath);
   res.writeHead(200, { "Content-Type": "image/jpg" });
   res.end(img, "binary");
 });
